@@ -1,0 +1,9 @@
+{
+  "key": "NaviNIBS_Simulated_Tools",
+  "MainViewPanels": {
+    "SimulatedToolsPanel": {
+      "ClassName": "SimulatedToolsPanel",
+      "importModule": "NaviNIBS_Simulated_Tools.Navigator.GUI.ViewPanels.SimulatedToolsPanel"
+    }
+  }
+}
