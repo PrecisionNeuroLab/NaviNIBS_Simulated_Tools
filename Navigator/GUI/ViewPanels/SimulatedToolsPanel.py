@@ -17,6 +17,7 @@ import typing as tp
 
 from RTNaBS.Devices import TimestampedToolPosition
 from NaviNIBS_Simulated_Tools.Devices.SimulatedToolPositionsClient import SimulatedToolPositionsClient
+from NaviNIBS_Simulated_Tools.Navigator.Model.SimulatedToolsConfiguration import SimulatedTools as SimulatedToolsConfig, SimulatedToolPose
 from RTNaBS.Navigator.Model.Session import SubjectTracker
 from RTNaBS.Navigator.GUI.Widgets.TrackingStatusWidget import TrackingStatusWidget
 from RTNaBS.Navigator.GUI.ViewPanels.MainViewPanelWithDockWidgets import MainViewPanelWithDockWidgets
@@ -43,8 +44,24 @@ class SimulatedToolsPanel(MainViewPanelWithDockWidgets):
 
     _positionsClient: SimulatedToolPositionsClient = attrs.field(init=False)
 
+    _hasRestoredPositions: bool = attrs.field(init=False, default=False)
+
     def __attrs_post_init__(self):
         super().__attrs_post_init__()
+
+    def _onSessionSet(self):
+        super()._onSessionSet()
+
+        # initialize right away so will start listening to pose updates
+        self._positionsClient = SimulatedToolPositionsClient(
+            serverHostname=self.session.tools.positionsServerInfo.hostname,
+            serverPubPort=self.session.tools.positionsServerInfo.pubPort,
+            serverCmdPort=self.session.tools.positionsServerInfo.cmdPort,
+        )
+        # TODO: reconnect positions client if positionsServerInfo changes later
+        self._positionsClient.sigLatestPositionsChanged.connect(self._onLatestPositionsChanged)
+
+
 
     def canBeEnabled(self) -> tuple[bool, str | None]:
         if self.session is None:
@@ -110,13 +127,7 @@ class SimulatedToolsPanel(MainViewPanelWithDockWidgets):
         )
         self._wdgt.addDock(dock, position='right')
 
-        self._positionsClient = SimulatedToolPositionsClient(
-            serverHostname=self.session.tools.positionsServerInfo.hostname,
-            serverPubPort=self.session.tools.positionsServerInfo.pubPort,
-            serverCmdPort=self.session.tools.positionsServerInfo.cmdPort,
-        )
         self._trackingStatusWdgt.session = self.session
-        self._positionsClient.sigLatestPositionsChanged.connect(self._onLatestPositionsChanged)
         self._onLatestPositionsChanged()
 
         self._session.tools.sigItemsChanged.connect(self._onToolsChanged)
@@ -138,6 +149,40 @@ class SimulatedToolsPanel(MainViewPanelWithDockWidgets):
             self._onLatestPositionsChanged()
 
     def _onLatestPositionsChanged(self):
+
+        config: SimulatedToolsConfig = self.session.addons['NaviNIBS_Simulated_Tools'].SimulatedTools
+
+        if not self._hasRestoredPositions:
+            # restore previously-saved positions on startup
+            for trackerKey, pose in config.poses.items():
+                if pose.transf is None:
+                    continue
+
+                # only restore positions without a position already set
+                try:
+                    self._positionsClient.getLatestTransf(trackerKey)
+                except KeyError as e:
+                    # TODO: maybe make this async, after verifying won't cause concurrency problems
+                    self._positionsClient.recordNewPosition_sync(
+                        key=trackerKey,
+                        position=TimestampedToolPosition(
+                            time=time.time(),
+                            transf=pose.transf,
+                            relativeTo=pose.relativeTo,
+                        ))
+
+            self._hasRestoredPositions = True
+
+        for key, tool in self.session.tools.items():
+            transf = self._positionsClient.getLatestTransf(tool.trackerKey, None)
+            if transf is None and tool.trackerKey not in config.poses:
+                # don't add now
+                pass
+            else:
+                if tool.trackerKey not in config.poses:
+                    config.poses[tool.trackerKey] = SimulatedToolPose(key=tool.trackerKey)
+                config.poses[tool.trackerKey].transf = transf
+
         if not self._hasInitialized and not self.isInitializing:
             return
 

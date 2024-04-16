@@ -5,5 +5,11 @@
       "ClassName": "SimulatedToolsPanel",
       "importModule": "NaviNIBS_Simulated_Tools.Navigator.GUI.ViewPanels.SimulatedToolsPanel"
     }
+  },
+  "SessionAttrs": {
+    "SimulatedTools": {
+      "ClassName": "SimulatedTools",
+      "importModule": "NaviNIBS_Simulated_Tools.Navigator.Model.SimulatedToolsConfiguration"
+    }
   }
 }
