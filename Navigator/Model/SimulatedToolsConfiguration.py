@@ -4,11 +4,11 @@ import attrs
 import numpy as np
 import typing as tp
 
-from RTNaBS.Navigator.Model.Addons import AddonSessionConfig
-from RTNaBS.Navigator.Model.Session import Session
-from RTNaBS.Navigator.Model.GenericCollection import GenericCollection, GenericCollectionDictItem
-from RTNaBS.util.attrs import attrsAsDict
-from RTNaBS.util.numpy import attrsWithNumpyAsDict, attrsWithNumpyFromDict, array_equalish
+from NaviNIBS.Navigator.Model.Addons import AddonSessionConfig
+from NaviNIBS.Navigator.Model.Session import Session
+from NaviNIBS.Navigator.Model.GenericCollection import GenericCollection, GenericCollectionDictItem
+from NaviNIBS.util.attrs import attrsAsDict
+from NaviNIBS.util.numpy import attrsWithNumpyAsDict, attrsWithNumpyFromDict, array_equalish
 
 
 @attrs.define

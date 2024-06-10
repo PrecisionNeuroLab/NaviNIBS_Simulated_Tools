@@ -6,7 +6,7 @@ import typing as tp
 import zmq
 import zmq.asyncio as azmq
 
-from RTNaBS.Devices.ToolPositionsClient import ToolPositionsClient
+from NaviNIBS.Devices.ToolPositionsClient import ToolPositionsClient
 
 
 logger = logging.getLogger(__name__)

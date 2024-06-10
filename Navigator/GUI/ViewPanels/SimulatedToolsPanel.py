@@ -15,18 +15,18 @@ import time
 import typing as tp
 
 
-from RTNaBS.Devices import TimestampedToolPosition
+from NaviNIBS.Devices import TimestampedToolPosition
 from NaviNIBS_Simulated_Tools.Devices.SimulatedToolPositionsClient import SimulatedToolPositionsClient
 from NaviNIBS_Simulated_Tools.Navigator.Model.SimulatedToolsConfiguration import SimulatedTools as SimulatedToolsConfig, SimulatedToolPose
-from RTNaBS.Navigator.Model.Session import SubjectTracker
-from RTNaBS.Navigator.GUI.Widgets.TrackingStatusWidget import TrackingStatusWidget
-from RTNaBS.Navigator.GUI.ViewPanels.MainViewPanelWithDockWidgets import MainViewPanelWithDockWidgets
-from RTNaBS.util.Asyncio import asyncTryAndLogExceptionOnError
-from RTNaBS.util.json import jsonPrettyDumps
-from RTNaBS.util.pyvista import Actor, setActorUserTransform
-from RTNaBS.util.pyvista.PlotInteraction import pickActor, interactivelyMoveActor
-from RTNaBS.util.Transforms import invertTransform, concatenateTransforms
-from RTNaBS.util.pyvista.plotting import BackgroundPlotter
+from NaviNIBS.Navigator.Model.Session import SubjectTracker
+from NaviNIBS.Navigator.GUI.Widgets.TrackingStatusWidget import TrackingStatusWidget
+from NaviNIBS.Navigator.GUI.ViewPanels.MainViewPanelWithDockWidgets import MainViewPanelWithDockWidgets
+from NaviNIBS.util.Asyncio import asyncTryAndLogExceptionOnError
+from NaviNIBS.util.json import jsonPrettyDumps
+from NaviNIBS.util.pyvista import Actor, setActorUserTransform
+from NaviNIBS.util.pyvista.PlotInteraction import pickActor, interactivelyMoveActor
+from NaviNIBS.util.Transforms import invertTransform, concatenateTransforms
+from NaviNIBS.util.pyvista.plotting import BackgroundPlotter
 
 
 logger = logging.getLogger(__name__)
