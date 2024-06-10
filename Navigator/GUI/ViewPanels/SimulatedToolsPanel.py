@@ -35,6 +35,7 @@ logger.setLevel(logging.INFO)
 
 @attrs.define
 class SimulatedToolsPanel(MainViewPanelWithDockWidgets):
+    _label: str = 'Simulated tools'
     _icon: QtGui.QIcon = attrs.field(init=False, factory=lambda: qta.icon('mdi6.progress-wrench'))
     _trackingStatusWdgt: TrackingStatusWidget = attrs.field(init=False)
     _plotter: BackgroundPlotter = attrs.field(init=False)
@@ -49,6 +50,10 @@ class SimulatedToolsPanel(MainViewPanelWithDockWidgets):
     def __attrs_post_init__(self):
         super().__attrs_post_init__()
 
+    @property
+    def positionsClient(self):
+        return self._positionsClient
+
     def _onSessionSet(self):
         super()._onSessionSet()
 
@@ -60,7 +65,6 @@ class SimulatedToolsPanel(MainViewPanelWithDockWidgets):
         )
         # TODO: reconnect positions client if positionsServerInfo changes later
         self._positionsClient.sigLatestPositionsChanged.connect(self._onLatestPositionsChanged)
-
 
 
     def canBeEnabled(self) -> tuple[bool, str | None]:
