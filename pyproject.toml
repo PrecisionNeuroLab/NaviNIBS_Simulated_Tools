@@ -1,0 +1,22 @@
+[project]
+classifiers = [
+    "License :: OSI Approved :: GNU Lesser General Public License v3 or later (LGPLv3+)"
+]
+
+[tool.poetry]
+name = "NaviNIBS_Simulated_Tools"
+version = "0.0.1"
+description = "NaviNIBS addon for simulating tool poses"
+authors = ["Christopher C. Cline <chriscline@users.noreply.github.com>"]
+license = "LGPLv3"
+packages = [
+    { include = "NaviNIBS_Simulated_Tools", from = ".." }
+]
+
+[tool.poetry.dependencies]
+python = ">=3.10,<3.12"
+navinibs = [
+    #{version="^0.0.2", develop=true},
+    {path="../../dist/navinibs-0.0.1-py3-none-any.whl"}
+]
+
