@@ -84,6 +84,8 @@ class SimulatedTools(AddonSessionConfig):
     def asDict(self) -> dict[str, tp.Any]:
         d = attrsAsDict(self, exclude=['poses'])
         d['poses'] = self._poses.asList()
+        if len(d['poses']) == 0:
+            del d['poses']
         return d
 
     @classmethod
