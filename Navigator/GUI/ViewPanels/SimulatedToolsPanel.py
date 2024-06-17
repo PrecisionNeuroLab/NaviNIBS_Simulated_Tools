@@ -379,13 +379,14 @@ class SimulatedToolsPanel(MainViewPanelWithDockWidgets):
             )
         )
 
-    async def selectAndMoveTool(self):
-        # start by picking mesh to move
-        pickedActor = await pickActor(self._plotter,
-                                      show=True,
-                                      show_message='Left click on mesh to move',
-                                      style='wireframe',
-                                      left_clicking=True)
+    async def selectAndMoveTool(self, pickedActor: Actor | None = None):
+        if pickedActor is None:
+                # start by picking mesh to move
+                pickedActor = await pickActor(self._plotter,
+                                              show=True,
+                                              show_message='Left click on mesh to move',
+                                              style='wireframe',
+                                              left_clicking=True)
         try:
             pickedKey = [actorKey for actorKey, actor in self._actors.items() if actor is pickedActor][0]
         except IndexError as e:
