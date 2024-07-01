@@ -66,6 +66,8 @@ class SimulatedToolsPanel(MainViewPanelWithDockWidgets):
         # TODO: reconnect positions client if positionsServerInfo changes later
         self._positionsClient.sigLatestPositionsChanged.connect(self._onLatestPositionsChanged)
 
+        self._onLatestPositionsChanged()
+
 
     def canBeEnabled(self) -> tuple[bool, str | None]:
         if self.session is None:
@@ -282,7 +284,14 @@ class SimulatedToolsPanel(MainViewPanelWithDockWidgets):
             pass  # self._plotter.reset_camera()
 
     def clearAllPositions(self):
-        raise NotImplementedError  # TODO
+        for key, tool in self.session.tools.items():
+            self._positionsClient.recordNewPosition_sync(
+                key=tool.trackerKey,
+                position=TimestampedToolPosition(
+                    time=time.time(),
+                    transf=None
+                )
+            )
 
     def zeroAllPositions(self):
         for key, tool in self.session.tools.items():
@@ -357,33 +366,40 @@ class SimulatedToolsPanel(MainViewPanelWithDockWidgets):
 
         logger.info(f'Exported positions snapshot to {filepath}')
 
-    async def selectAndClearToolPos(self):
-        # start by picking mesh to move
-        pickedActor = await pickActor(self._plotter,
-                                      show=True,
-                                      show_message='Left click on mesh to clear',
-                                      style='wireframe',
-                                      left_clicking=True)
-        try:
-            pickedKey = [actorKey for actorKey, actor in self._actors.items() if actor is pickedActor][0]
-        except IndexError as e:
-            logger.warning('Unrecognized actor picked. Cancelling select')
-            return
-        if pickedKey.endswith('_tracker'):
-            pickedTool = self.session.tools[pickedKey[:-len('_tracker')]]
-        elif pickedKey.endswith('_tool'):
-            pickedTool = self.session.tools[pickedKey[:-len('_tool')]]
-        else:
-            raise NotImplementedError
-        logger.info(f'Picked actor {pickedKey} ({pickedTool.key}) to move')
+    async def clearToolPos(self, toolKey: str):
+        logger.info(f'Clearing position of {toolKey}')
 
-        self._positionsClient.recordNewPosition_sync(
-            key=pickedTool.trackerKey,
+        await self._positionsClient.recordNewPosition_async(
+            key=self.session.tools[toolKey].trackerKey,
             position=TimestampedToolPosition(
                 time=time.time(),
                 transf=None
             )
         )
+
+    async def selectAndClearToolPos(self, toolKey: str | None = None):
+        if toolKey is None:
+            # start by picking mesh to move
+            pickedActor = await pickActor(self._plotter,
+                                          show=True,
+                                          show_message='Left click on mesh to clear',
+                                          style='wireframe',
+                                          left_clicking=True)
+            try:
+                pickedKey = [actorKey for actorKey, actor in self._actors.items() if actor is pickedActor][0]
+            except IndexError as e:
+                logger.warning('Unrecognized actor picked. Cancelling select')
+                return
+            if pickedKey.endswith('_tracker'):
+                pickedTool = self.session.tools[pickedKey[:-len('_tracker')]]
+            elif pickedKey.endswith('_tool'):
+                pickedTool = self.session.tools[pickedKey[:-len('_tool')]]
+            else:
+                raise NotImplementedError
+
+            toolKey = pickedTool.key
+
+        await self.clearToolPos(toolKey)
 
     async def selectAndMoveTool(self, pickedActor: Actor | None = None):
         if pickedActor is None:
