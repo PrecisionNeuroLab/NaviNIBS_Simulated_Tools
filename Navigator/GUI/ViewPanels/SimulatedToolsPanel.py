@@ -298,30 +298,36 @@ class SimulatedToolsPanel(MainViewPanelWithDockWidgets):
                                                                 transf=np.eye(4),
                                                          ))
 
-    async def importPositionsSnapshot(self, filepath: str | None = None):
+    async def importPositionsSnapshot(self, filepath: str | None = None, positionsDict: dict[str, dict] | None = None):
 
-        if filepath is None:
-            filepath, _ = QtWidgets.QFileDialog.getOpenFileName(self._wdgt,
-                                                                'Select positions snapshot to import')
-            # filepath, _ = QtWidgets.QFileDialog.getOpenFileName(self._wdgt,
-            #                                                  'Select positions snapshot to import',
-            #                                                  self.session.unpackedSessionDir,
-            #                                                  'json (*.json)')
+        if positionsDict is None:
+            if filepath is None:
+                filepath, _ = QtWidgets.QFileDialog.getOpenFileName(self._wdgt,
+                                                                    'Select positions snapshot to import')
+                # filepath, _ = QtWidgets.QFileDialog.getOpenFileName(self._wdgt,
+                #                                                  'Select positions snapshot to import',
+                #                                                  self.session.unpackedSessionDir,
+                #                                                  'json (*.json)')
 
-        if len(filepath) == 0:
-            logger.warning('Import cancelled')
-            return
+            if len(filepath) == 0:
+                logger.warning('Import cancelled')
+                return
 
-        with open(filepath, 'r') as f:
-            positions: dict[str, dict] = json.load(f)
+            with open(filepath, 'r') as f:
+                positionsDict: dict[str, dict] = json.load(f)
+        else:
+            positionsDict = positionsDict.copy()
 
-        for key in positions.keys():
-            positions[key] = TimestampedToolPosition.fromDict(positions[key])
+        for key in positionsDict.keys():
+            positionsDict[key] = TimestampedToolPosition.fromDict(positionsDict[key])
 
-        for key, tsPos in positions.items():
+        for key, tsPos in positionsDict.items():
             tsPos.time = time.time()  # overwrite old time to make this look like a "new" position
             logger.info('Setting position for ' + key + ' to ' + str(tsPos.transf))
-            await self._positionsClient.recordNewPosition_async(key=key, position=tsPos)
+            if True:
+                await self._positionsClient.recordNewPosition_async(key=key, position=tsPos)
+            else:
+                self._positionsClient.recordNewPosition_sync(key=key, position=tsPos)
 
     async def exportPositionsSnapshot(self, filepath: str | None = None,
                                 doIncludeToolsWithRelativePositions: bool = False):
