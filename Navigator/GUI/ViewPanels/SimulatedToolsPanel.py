@@ -241,7 +241,7 @@ class SimulatedToolsPanel(MainViewPanelWithDockWidgets):
 
                                         self._actors[actorKey] = self._plotter.addMesh(mesh=mesh,
                                                                                        color=meshColor,
-                                                                                       defaultMeshColor='#2222ff',
+                                                                                       defaultMeshColor='#444444',
                                                                                        opacity=1.0 if meshOpacity is None else meshOpacity,
                                                                                        name=actorKey)
 
