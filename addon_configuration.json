@@ -1,6 +1,6 @@
 {
   "key": "NaviNIBS_Simulated_Tools",
-  "addonVersion": "0.1.1",
+  "addonVersion": "0.1.3",
   "MainViewPanels": {
     "SimulatedToolsPanel": {
       "ClassName": "SimulatedToolsPanel",
