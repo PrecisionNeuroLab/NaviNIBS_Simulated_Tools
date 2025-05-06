@@ -22,6 +22,7 @@ from NaviNIBS.Navigator.Model.Session import SubjectTracker
 from NaviNIBS.Navigator.GUI.Widgets.TrackingStatusWidget import TrackingStatusWidget
 from NaviNIBS.Navigator.GUI.ViewPanels.MainViewPanelWithDockWidgets import MainViewPanelWithDockWidgets
 from NaviNIBS.util.Asyncio import asyncTryAndLogExceptionOnError
+from NaviNIBS.util.GUI.Icons import getIcon
 from NaviNIBS.util.json import jsonPrettyDumps
 from NaviNIBS.util.pyvista import Actor, setActorUserTransform
 from NaviNIBS.util.pyvista.PlotInteraction import pickActor, interactivelyMoveActor
@@ -36,7 +37,7 @@ logger.setLevel(logging.INFO)
 @attrs.define
 class SimulatedToolsPanel(MainViewPanelWithDockWidgets):
     _label: str = 'Simulated tools'
-    _icon: QtGui.QIcon = attrs.field(init=False, factory=lambda: qta.icon('mdi6.progress-wrench'))
+    _icon: QtGui.QIcon = attrs.field(init=False, factory=lambda: getIcon('mdi6.progress-wrench'))
     _trackingStatusWdgt: TrackingStatusWidget = attrs.field(init=False)
     _plotter: BackgroundPlotter = attrs.field(init=False)
     _actors: tp.Dict[str, tp.Optional[Actor]] = attrs.field(init=False, factory=dict)
