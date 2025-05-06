@@ -5,7 +5,7 @@ classifiers = [
 
 [tool.poetry]
 name = "NaviNIBS_Simulated_Tools"
-version = "0.1.3"
+version = "0.1.4"
 description = "NaviNIBS addon for simulating tool poses"
 homepage = "https://github.com/PrecisionNeuroLab/NaviNIBS"
 repository = "https://github.com/PrecisionNeuroLab/NaviNIBS_Simulated_Tools"
