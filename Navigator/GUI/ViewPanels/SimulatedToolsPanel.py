@@ -24,7 +24,7 @@ from NaviNIBS.Navigator.GUI.ViewPanels.MainViewPanelWithDockWidgets import MainV
 from NaviNIBS.util.Asyncio import asyncTryAndLogExceptionOnError
 from NaviNIBS.util.GUI.Icons import getIcon
 from NaviNIBS.util.json import jsonPrettyDumps
-from NaviNIBS.util.pyvista import Actor, setActorUserTransform
+from NaviNIBS.util.pyvista import Actor, setActorUserTransform, RemotePlotterProxy
 from NaviNIBS.util.pyvista.PlotInteraction import pickActor, interactivelyMoveActor
 from NaviNIBS.util.Transforms import invertTransform, concatenateTransforms
 from NaviNIBS.util.pyvista.plotting import BackgroundPlotter
@@ -48,6 +48,8 @@ class SimulatedToolsPanel(MainViewPanelWithDockWidgets):
 
     _hasRestoredPositions: bool = attrs.field(init=False, default=False)
 
+    finishedAsyncInit: asyncio.Event = attrs.field(init=False, factory=asyncio.Event)
+
     def __attrs_post_init__(self):
         super().__attrs_post_init__()
 
@@ -68,7 +70,6 @@ class SimulatedToolsPanel(MainViewPanelWithDockWidgets):
         self._positionsClient.sigLatestPositionsChanged.connect(self._onLatestPositionsChanged)
 
         self._onLatestPositionsChanged()
-
 
     def canBeEnabled(self) -> tuple[bool, str | None]:
         if self.session is None:
@@ -139,8 +140,13 @@ class SimulatedToolsPanel(MainViewPanelWithDockWidgets):
 
         self._session.tools.sigItemsChanged.connect(self._onToolsChanged)
 
-        if True == False:
-            pass
+        asyncio.create_task(asyncTryAndLogExceptionOnError(self._finishInitialization_async))
+
+    async def _finishInitialization_async(self):
+        if isinstance(self._plotter, RemotePlotterProxy):
+            await self._plotter.isReadyEvent.wait()
+
+        self.finishedAsyncInit.set()
 
     def _onToolsChanged(self, toolKeysChanged: tp.List[str], changedAttribs: tp.Optional[list[str]] = None):
         didRemove = False
